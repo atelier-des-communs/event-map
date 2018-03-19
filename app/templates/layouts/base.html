@@ -3,9 +3,11 @@
 <!DOCTYPE html>
 <html>
     <head>
+        		
         {% include 'partials/_head.html' %}
         {# Any templates that extend this template can set custom_head_tags to add scripts to their page #}
         {% block custom_head_tags %}{% endblock %}
+      
     </head>
     <body>
       {# Example dropdown menu setup. Uncomment lines to view
@@ -38,11 +40,6 @@
         {% block content %}
         {% endblock %}
 
-        {# Implement CSRF protection for site #}
-        {% if csrf_token()|safe %}
-            <div style="visibility: hidden; display: none">
-              <input type="hidden" name="csrf_token" value="{{ csrf_token()|safe }}">
-            </div>
-        {% endif %}
+
     </body>
 </html>

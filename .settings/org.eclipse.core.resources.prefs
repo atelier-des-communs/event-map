@@ -1,0 +1,10 @@
+eclipse.preferences.version=1
+encoding//env/lib/python3.5/site-packages/flask/blueprints.py=utf-8
+encoding//env/lib/python3.5/site-packages/flask_login/mixins.py=utf-8
+encoding//env/lib/python3.5/site-packages/flask_mail.py=utf-8
+encoding//env/lib/python3.5/site-packages/flask_rq.py=utf-8
+encoding//env/lib/python3.5/site-packages/flask_wtf/__init__.py=utf-8
+encoding//env/lib/python3.5/site-packages/flask_wtf/form.py=utf-8
+encoding//env/lib/python3.5/site-packages/flask_wtf/html5.py=utf-8
+encoding//env/lib/python3.5/site-packages/flask_wtf/recaptcha/widgets.py=utf-8
+encoding//env/lib/python3.5/site-packages/rq/queue.py=utf-8

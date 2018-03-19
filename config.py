@@ -41,6 +41,13 @@ class Config:
     # Analytics
     GOOGLE_ANALYTICS_ID = os.environ.get('GOOGLE_ANALYTICS_ID') or ''
     SEGMENT_API_KEY = os.environ.get('SEGMENT_API_KEY') or ''
+    
+    # FB
+    FB_TOKEN=os.environ.get('FB_TOKEN')
+
+    # Recpatcha
+    RECAPTCHA_PRIVATE_KEY = os.environ.get('RECAPTCHA_PRIVATE_KEY')
+    RECAPTCHA_PUBLIC_KEY = os.environ.get('RECAPTCHA_PUBLIC_KEY')
 
     # Admin account
     ADMIN_PASSWORD = os.environ.get('ADMIN_PASSWORD') or 'password'
