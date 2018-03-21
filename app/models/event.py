@@ -1,10 +1,29 @@
 from flask import current_app
-
+from datetime import  datetime
 from .. import db
+import pytz
 
+
+
+def serialize(value):
+    if value is None :
+        return None
+    if isinstance(value,datetime) :
+        return value.replace(tzinfo=pytz.UTC).isoformat()
+    else :
+        return value
+
+class RemoteCountIP(db.Model):
+    __tablename__ = 'count_ip'
+    id = db.Column(db.Integer, primary_key=True)
+    ip = db.Column(db.String(64), unique=True)
 
 class Event(db.Model):
     __tablename__ = 'event'
+    
+    creator = db.Column(db.DATETIME)
+    create_time = db.Column(db.String(64))
+    
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(64))
     description = db.Column(db.Text())
@@ -28,5 +47,5 @@ class Event(db.Model):
         return "<Event '%s:%s'>" % (self.id, self.name)
     
     def as_dict(self):
-        return {c.name: getattr(self, c.name) for c in self.__table__.columns}
+        return {c.name: serialize(getattr(self, c.name)) for c in self.__table__.columns}
 

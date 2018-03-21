@@ -2,16 +2,15 @@
 
 from flask_wtf import Form, RecaptchaField
 from wtforms import TextField
-from wtforms.fields.core import StringField, IntegerField, FloatField
+from wtforms.fields.core import StringField, IntegerField, FloatField, DateTimeField
 from wtforms.validators import InputRequired, Length
-from wtforms.fields.html5 import DateTimeField
 
 class EventForm(Form):
-    recaptcha = RecaptchaField()
+    recaptcha = RecaptchaField("recaptcha")
 
     id = StringField('id')
     
-    name = StringField('id', validators=[InputRequired(),  Length(1, 300)])
+    name = StringField('name', validators=[InputRequired(),  Length(1, 300)])
     description = TextField('Description')
     
     fb_id = StringField('Facebook event id')
@@ -27,6 +26,7 @@ class EventForm(Form):
     loc_longitude = FloatField('Longitude', validators=[InputRequired()])
     loc_zip = StringField('Zip code')
     
-    start_time = DateTimeField('Start time', validators=[InputRequired()])
+    start_datetime = DateTimeField('Start time', format='%Y-%m-%dT%H:%M:%SZ', validators=[InputRequired()])
+    # end_datetime = DateTimeField('End time', validators=[InputRequired()])
     # end_time = db.Column(db.DATETIME)
     

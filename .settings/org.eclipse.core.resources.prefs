@@ -1,5 +1,7 @@
 eclipse.preferences.version=1
+encoding//env/lib/python3.5/site-packages/flask/__init__.py=utf-8
 encoding//env/lib/python3.5/site-packages/flask/blueprints.py=utf-8
+encoding//env/lib/python3.5/site-packages/flask/json.py=utf-8
 encoding//env/lib/python3.5/site-packages/flask_login/mixins.py=utf-8
 encoding//env/lib/python3.5/site-packages/flask_mail.py=utf-8
 encoding//env/lib/python3.5/site-packages/flask_rq.py=utf-8

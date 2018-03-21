@@ -28,3 +28,62 @@ table.selectable tr:hover {
 #eh-location-picker-map {
   height: 400px;
 }
+
+@media -sass-debug-info{filename{}line{font-family:\0000341}}
+.main-title {
+  font-family: 'Lobster Two', cursive;
+  font-size: 35pt;
+  color: #d13333;
+}
+
+@media -sass-debug-info{filename{}line{font-family:\0000347}}
+.items.logo {
+  padding: 20px;
+}
+
+@media -sass-debug-info{filename{}line{font-family:\0000351}}
+.page-header {
+  background-image: url(/static/images/france.jpg);
+}
+
+@media -sass-debug-info{filename{}line{font-family:\0000355}}
+#main-map {
+  height: 500px;
+  width: 100%;
+}
+
+@media -sass-debug-info{filename{}line{font-family:\0000360}}
+.hidden {
+  display: none !important;
+}
+
+@media -sass-debug-info{filename{}line{font-family:\0000364}}
+.ui.segment.item {
+  position: relative;
+  background: #fff;
+  box-shadow: 0px 1px 2px 0 rgba(34, 36, 38, 0.15);
+  margin: 1rem 0;
+  padding: 1em;
+  border-radius: 0.25rem;
+  border: 1px solid rgba(34, 36, 38, 0.15);
+}
+
+@media -sass-debug-info{filename{}line{font-family:\0000374}}
+.buttons {
+  margin-top: 20px;
+  margin-bottom: 20px;
+}
+
+@media -sass-debug-info{filename{}line{font-family:\0000379}}
+.main.container {
+  padding: 10px;
+}
+
+@media -sass-debug-info{filename{}line{font-family:\0000383}}
+.footer {
+  background: black;
+  color: white;
+  padding: 20px;
+  font-size: large;
+  margin-top: 300px;
+}

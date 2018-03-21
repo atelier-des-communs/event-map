@@ -1,0 +1,189 @@
+{% extends 'layouts/base.html' %} 
+
+{% block custom_head_tags %}
+    <title>Jour de manif</title>
+    <meta name="description" content="Carte collaborative. Lieux et horaires des manifs.">
+    <meta property="og:type" content="article" />
+    <meta property="og:image" content="http://jour-de-manif.fr/static/images/jour-de-manif.png" />
+{% endblock %}
+
+
+{% block content %}
+
+<script type="text/javascript">
+	events = {{json_events|tojson|safe}}
+</script>
+
+<div class="ui container center main">
+
+    <h1 class="header ">Manifestation du 22 mars, en soutien aux cheminots, et contre la politique de Macron</h1>
+    <p>
+        Retrouvez ci dessous la liste des mobilisations, dans toute la France.<br/>
+        Comptez vous !
+    </p>
+    <div class="buttons">
+        <div class="positive labeled icon ui button eh-add-event">
+            <i class="add icon"></i>
+            Ajouter un événement
+        </div>
+
+        <div class="ui labeled float right button total-count-button">
+            <div class="ui red button">
+                <i class="bullhorn icon"></i>
+                Je participe !
+            </div>
+            <span class="ui basic red left pointing label eh-main-count"></span>
+        </div>
+    </div>
+
+    <div id="main-map"></div>
+
+    <div class="ui items">
+
+        {% for event in events %}
+        <div class="ui item segment">
+            <div class="content">
+                <a class="header">{{event.loc_city}} {%if event.loc_zip %} [{{event.loc_zip}}] {% endif %}</a>
+                <div class="meta">
+                    <i class="calendar icon"></i>
+                    <span>{{ event.start_datetime | localdate }}</span>
+                    <i class="clock icon"></i>
+                    <span>{{ event.start_datetime | localtime }}</span><br />
+                    <i class="map marker icon"></i>
+                    <span>{{event.loc_name}}</span>
+                </div>
+                <div class="description">
+                    {% if event.fb_id %}
+                    <i class="facebook icon"></i>
+                    <a href="http://www.facebook.com/events/{{ event.fb_id }}"> {{event.name}} </a> {% else %} <b>{{event.name}}</b> {%
+                    endif %}
+                </div>
+                <div class="extra">
+                    <div class="ui positive  button view-button" data-event-id="{{event.id}}">
+                        <i class="eye icon"></i>
+                        Détails
+                    </div>
+                    <div class="ui right small labeled button count-button" data-event-id="{{event.id}}">
+                        <a class="ui red  button"> <i class="bullhorn icon"></i> Je participe !
+                        </a> <span class="small ui basic red left pointing label"> {{ event.fb_maybe_count + event.fb_attending_count +
+                            event.attending_count}} </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+
+    </div>
+
+</div>
+
+
+
+<div class="ui large modal eh-add-event">
+    <div class="header">
+        <span class="edit-only">Ajouter un événement</span> <span class="view-only">Voir un événement</span>
+    </div>
+    <div class="content">
+        <form method=post class="ui form eh-event-form" autocomplete="off">
+
+            <div class="field">
+                <label>Événement Facebook</label>
+
+                <input name="fb_id" type="hidden">
+                <input name="fb_attending_count" type="hidden">
+                <input name="fb_maybe_count" type="hidden">
+
+                <div class="ui left icon input edit-only">
+                    <i class="ui blue facebook icon"></i>
+                    <input name="fb_link" placeholder="Lien vers évènement Facebook : http://facebook.com/events/<id>..." type="text">
+                </div>
+                <div class="view-only">
+                    <i class="facebook icon"> </i>
+                    <a class="fb-link" href="http://foobr">http://foobar</a>
+                </div>
+            </div>
+
+            <div class="ui horizontal divider">
+                <span class="edit-only">Ou</span>
+            </div>
+
+            <div class="ui stackable two column grid">
+
+                <div class="column">
+
+                    <div class="required field">
+                        <label>Lieu</label>
+                        <div class="ui search location eh-place-text">
+                            <div class="ui icon input">
+                                <input name="loc_title" class="prompt" placeholder="Lieu.." type="text">
+                                <i class="map marker icon"></i>
+                            </div>
+                            <div class="results" style="z-index: 1200;"></div>
+                        </div>
+
+                        <div id="eh-location-picker-map"></div>
+
+                        <input name="loc_latitude" type=hidden />
+                        <input name="loc_longitude" type=hidden />
+                        <input name="loc_id" type=hidden />
+                        <input name="loc_city" type=hidden />
+                        <input name="loc_zip" type=hidden />
+                        <input name="loc_name" type=hidden />
+                    </div>
+
+                </div>
+
+                <div class="column">
+
+
+                    <div class="field">
+                        <label>Début</label>
+                        <div class="two fields">
+                            <input name="start_datetime" type=hidden />
+                            <div class="disabled field fb-disabled">
+                                <input name="start_date" value="2018-03-22" type=date />
+                            </div>
+                            <div class="required field fb-disabled">
+                                <div class="ui selection dropdown">
+                                    <input name="start_time" type="hidden">
+                                    <div class="default text eh-start-time-text">hh:mm</div>
+                                    <i class="clock icon"></i>
+                                    <div class="time menu"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="required field fb-disabled">
+                        <label>Nom</label>
+                        <input name="name" type=text />
+                    </div>
+
+                    <div class="field fb-disabled">
+                        <label>Description</label>
+                        <textarea name="description"></textarea>
+                    </div>
+
+                    <div class="edit-only">{{ form.recaptcha }}</div>
+                    <input type="hidden" name="recaptcha" id="recaptch-validation">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token()|safe }}">
+                </div>
+            </div>
+            <div class="ui error message"></div>
+        </form>
+    </div>
+
+    <div class="actions">
+        <div class="ui black deny button edit-only">Annuler</div>
+        <div class="ui deny button view-only">Ok</div>
+        <div class="ui positive right labeled icon button edit-only">
+            Ajouter
+            <i class="add icon"></i>
+        </div>
+    </div>
+</div>
+
+
+
+
+{% endblock %}

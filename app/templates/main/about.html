@@ -1,11 +1,24 @@
 {% import 'macros/page_macros.html' as page %}
 {% extends 'layouts/base.html' %}
 
-{% block content %}
-    <div class="ui text container">
-        <h1>About</h1>
-        {{ page.render_inline_editor(editable_html_obj, current_user) }}
-    </div>
 
-    <script src="{{ url_for('static', filename='ckeditor/ckeditor.js') }}"></script>
+{% block custom_head_tags %}
+    <title>Jour de manif</title>
+    <meta name="description" content="Carte collaborative. Lieux et horaires des manifs.">
+    <meta property="og:type" content="article" />
+    <meta property="og:image" content="http://jour-de-manif.fr/static/images/jour-de-manif.png" />
+{% endblock %}
+
+{% block content %}
+<div class="ui container center main">
+    <h1 class="header">À propos</h1>
+    <p>
+        Jour de manif est un site collaboratif qui recense les lieux et horaires des manifs en France.
+        <br/>
+        Ce site est une initiative à but non lucratif et 
+        <a href="https://github.com/atelier-des-communs/event-map">open source</a>, 
+        réalisé par <a href="http://atelier-des-communs.fr">{<i class="globe icon"></i>} Atelier Des Communs</a>.
+        
+    </p>
+</div>
 {% endblock %}

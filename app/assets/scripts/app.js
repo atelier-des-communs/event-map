@@ -23,7 +23,6 @@ function extract(address, properties, first) {
 	return values.join(", ");
 }
 
-
 function create_map(element_id, position, zoom) {
 	  var map = L.map(element_id);
 	  var osmUrl='https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
@@ -42,7 +41,9 @@ $(document).ready(function () {
 
 	$.fn.api.settings.api = {
 		"nominatim search" : 'https://nominatim.openstreetmap.org/search?format=json&addressdetails=1&countrycodes=fr&q={query}',
-		"nominatim reverse" : 'https://nominatim.openstreetmap.org/reverse?format=json&addressdetails=1&lat={lat}&lon={lon}'
+		"nominatim reverse" : 'https://nominatim.openstreetmap.org/reverse?format=json&addressdetails=1&lat={lat}&lon={lon}',
+		"search fb" : '/rest/fb-event/{event_id}',
+		"increment counter" : '/rest/add-count/{event_id}'
 	}
 	
 	
@@ -71,8 +72,11 @@ $(document).ready(function () {
   
   var form = $(".eh-event-form").form({
     fields: {
-      description : {
-          rules: [{type : 'empty', prompt : 'La description est requise'}]
+      name : {
+          rules: [{type : 'empty', prompt : "Le nom est requis"}]
+      },
+      start_date : {
+          rules: [{type : 'empty', prompt : "La date est requise"}]
       },
       start_time : {
           rules: [{type : 'empty', prompt : "L'heure est requise"}]
@@ -96,18 +100,163 @@ $(document).ready(function () {
   } 
   $(".ui.dropdown.time").dropdown();
   
+  function fillFromJSON(res) {
+	  $("[name]", form).each(function(input) {
+		  var name = $(this).attr("name");
+		  if (res.hasOwnProperty(name)) {
+			  $(this).val(res[name]);
+		  }
+	  });
+	  
+	  // Set link
+	  if (res.fb_id) {
+		  var fb_link = "http://www.facebook.com/events/" + res.fb_id;
+		  $(".fb-link").attr("href", fb_link);
+		  $(".fb-link").text(fb_link);
+	  }
+	  // Split date time
+	  var local_start_datetime = moment(res.start_datetime).local();
+	  var local_time = local_start_datetime.format("HH:mm");
+	  var local_date = local_start_datetime.format("YYYY-MM-DD");
+	  $("input[name=start_date]").val(local_date);
+	  
+	  $("input[name=start_time]").val(local_time);
+	  $(".eh-start-time-text").text(local_time);
+	  
+	  // Set location
+	  $("input[name=loc_title]").val(res.loc_name);
+	  
+	  if (res.loc_latitude) {
+		  updateMarkerLocation(
+				  res.loc_latitude,
+				  res.loc_longitude, 
+				  true);
+	  } else {
+		  // No precise location yet
+		  
+	  }
+	  
+	  // Disable all fields
+	  // $(".fb-disabled", form).addClass("disabled");
+	  
+	  // Disable location if set in facebook
+	  //$("input[name=loc_id]").parents(".field").toggleClass(
+		//	  "disabled", 
+		//	  res.loc_id);
+	  
+  }
   
+  // Fb Link handling
+  $("input[name=fb_link]").on("input", function() {
+	  var self = $(this);
+	  var parent_field = self.parents(".field");
+	  var parent_input = self.parents(".input");
+	  
+	  var link = self.val();
+	  var res = link.match(/.*facebook\.com\/events\/(\d+).*/)
+	  
+	  if (res == null ) {
+		  parent_field.addClass("error");
+		  self.attr("title", "Doit être au format : *facebook.com\events/<id>/*");
+		  return;
+	  }
+	  
+	  parent_field.removeClass("error");
+	  
+	  var event_id = res[1];
+	  
+	  // Set loading
+	  parent_input.addClass("loading");
+	  
+	  self.api({
+		  action: 'search fb', 
+		  on : 'now',
+		  urlData : {event_id:event_id},
+	      onResponse: function(res) {
+	    	  parent_input.removeClass("loading");
+	    	  fillFromJSON(res);
+	  	  }});  
+  });
   
-  var map = create_map("eh-location-picker-map", [51.505, -0.09], 13);
+  var map = create_map("eh-location-picker-map",  [46.316584, 2.592773], 12);
+  var main_map = create_map("main-map", [46.316584, 2.592773], 6);
+  
+  function resetModal() {
+	  if (marker != null) {
+		  map.removeLayer(marker);
+		  marker= null;
+	  }
+	  $(form)[0].reset();
+  }
+  
+  function viewModal(event) {
+	  resetModal();
+	  fillFromJSON(event);
+	  showModal(true);  
+  }
+  
+  var nbParticipants = 0;
+  $.each(events, function(index, event) {
+	  marker = new L.marker(new L.LatLng(
+			  event.loc_latitude, 
+			  event.loc_longitude));
+	  main_map.addLayer(marker);
+	  marker.on("click", function() {
+		  viewModal(event);
+	  });
+	  nbParticipants += 
+		  event.fb_attending_count + 
+		  event.fb_maybe_count + 
+		  event.attending_count;
+  })
+  
+  $(".eh-main-count").text(nbParticipants);
   
   var marker = null;
-  function onMapClick(e) {
-	  updateMarkerLocation(e.latlng.lat, e.latlng.lng);
-  };
+
+  $(".view-button").click(function() {
+	  var eventId = $(this).attr("data-event-id");
+	  viewModal(events[eventId]);
+  })
+  
+  $(".total-count-button").click(function() {
+	 alert("Pour vous compter, cliquez une des manifestations de la liste en dessous"); 
+  });
+  
+   $(".count-button").click(function() {
+	  var eventId = $(this).attr("data-event-id");
+	  var csrf_token = $("input[name=csrf_token]").val();
+	  
+	  var label = $(".label", this);
+	  var count = parseInt(label.text());
+	  
+	  $(this).api({
+		  on : "now",
+		  action : "increment counter",
+		  method : 'POST',
+		  urlData: {event_id: eventId},
+		  data : {csrf_token: csrf_token},
+		  onSuccess: function(res) {
+			  console.log("incremented");
+			  count +=1;
+			  label.text(count);
+			  return res;
+		  },
+		  successTest: function(response) {
+		      return response.success || false;
+		  },
+		  onFailure: function(response) {
+			  alert(response.message);
+		  },
+		  
+	  });	  
+	  });
+ 
   
   function updateMarkerLocation(lat, lng, fromText) {
 	  if (!marker) {
-		  marker = new L.marker(new L.LatLng(lat, lng), {draggable:'true'});
+		  var viewMode = $(".modal").hasClass("view-mode");
+		  marker = new L.marker(new L.LatLng(lat, lng), {draggable: !viewMode});
 		  marker.on('dragend', function(event){
 			    var marker = event.target;
 			    var position = marker.getLatLng();
@@ -127,16 +276,15 @@ $(document).ready(function () {
 	  $("body").api({
 		  action: 'nominatim reverse', 
 		  on : 'now',
-			  urlData : {
-				  lat: lat,
-				  lon : lng
-			  },
+		  urlData : {
+			  lat: lat,
+			  lon : lng
+		  },
 	     onResponse: function(res) {
 	    	 var res = extractRes(res);
 	    	 setLocationInputVals(res);
 	    	 $(".eh-place-text").removeClass("loading");
 	  	 }});
-  
   }
   
   // Extract result from single nominatim response
@@ -163,7 +311,11 @@ $(document).ready(function () {
 	  });
   }
 
-  map.on('click', onMapClick);
+  map.on('click', function(e) {
+	  if (!$(".modal").hasClass("view-mode")) {  
+		  updateMarkerLocation(e.latlng.lat, e.latlng.lng);
+	  }
+  });
   
   $('.ui.search.location').search({
 	   apiSettings : {
@@ -184,6 +336,12 @@ $(document).ready(function () {
 	 }
   });
  
+  function prepareForm() {
+	  var start_date = $("input[name=start_date]").val();
+	  var start_time = $("input[name=start_time]").val();
+	  var datetime = moment(start_date + 'T' + start_time, moment.HTML5_FMT.DATETIME_LOCAL);
+	  $("input[name=start_datetime]").val(datetime.utc().format())
+  }
 
   var modal = $('.eh-add-event.modal').modal({
 	  onVisible : function() {
@@ -191,16 +349,24 @@ $(document).ready(function () {
 	    $(".leaflet-container").css('cursor','crosshair');
 	  },
 	  onApprove : function() {
+		  prepareForm();
 		  if (form.form("validate form")) {
-			  return form.form("submit");
-		  } else {
-			  return false;
+			   form.form("submit");
 		  }
+		  return false;
 	  }
   });
   
-  $('.eh-add-event.button').click(function() {
+  function showModal(view) {
+	  $(".eh-add-event.modal .view-only").toggleClass("hidden", !view);
+	  $(".eh-add-event.modal .edit-only").toggleClass("hidden", view);
+	  $('.eh-add-event.modal').toggleClass('view-mode', view);
 	  $('.eh-add-event.modal').modal('show');
+  }
+  
+  $('.eh-add-event.button').click(function() {
+	  resetModal();
+	  showModal(false);
   });
   
   

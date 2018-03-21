@@ -1,76 +1,23 @@
-{% extends 'layouts/base.html' %} {% block content %}
+{% extends 'layouts/base.html' %} 
 
-<div class="big positive labeled icon ui button eh-add-event">
-	<i class="add icon"></i> Ajouter un événement
-</div>
+{% block custom_head_tags %}
+    <title>Jour de manif</title>
+    <meta name="description" content="Carte collaborative. Lieux et horaires des manifs.">
+    <meta property="og:type" content="article" />
+    <meta property="og:image" content="http://jour-de-manif.fr/static/images/jour-de-manif.png" />
+{% endblock %}
 
+{% block content %}
+<div class="ui container center main">
+    <h1 class="header">Liste des jours de manif</h1>
 
-
-<div class="ui modal eh-add-event">
-	<div class="header">Ajouter un événement
-		<i class="floated right close icon"></i>
-	</div>
-	<div class="image content">
-		<div class="ui medium image">
-			<div id="eh-location-picker-map">
-			</div>
-		</div>
-		<form method=post class="ui form description eh-event-form" autocomplete="off" >
-	
-			<div class="required field">
-				<label>Lieu</label>
-				<div class="ui search location eh-place-text">
-	  				<div class="ui icon input">
-	  					<input name="loc_latitude" type=hidden />
-	  					<input name="loc_longitude" type=hidden />
-	  					<input name="loc_id" type=hidden />
-	  					<input name="loc_city" type=hidden />
-	  					<input name="loc_zip" type=hidden />
-	  					<input name="loc_name" type=hidden />
-	    				<input name="loc_title" class="prompt" placeholder="Lieu.." type="text">
-	    				<i class="map marker icon"></i>
-	  				</div>
-					<div class="results"></div>
-				</div>
-			</div>
-			
-			<div class="required field">
-				<label>Heure</label>
-				<div class="ui scrolling dropdown time">
-  					<input name="start_time" type="hidden">
-  					<div class="default text">hh:mm</div>
-    				<i class="clock icon"></i>
-    				<div class="time menu">
-  					</div>
-  				</div>
-			</div>
-			
-			<div class="required field">
-				<label>Description</label>
-  				<textarea name="description"></textarea>
-  			</div>
-  			
-  			{{ form.recaptcha }}
-  			<input type="hidden" name="recaptcha" id="recaptch-validation">
-  			
-  	
-        	{% if csrf_token()|safe %}
-            <div style="visibility: hidden; display: none">
-              <input type="hidden" name="csrf_token" value="{{ csrf_token()|safe }}">
+    <div class="ui segments">
+        <a href="/22-mars" class="segment">
+            <div style="margin: 10px;">
+                <h3 class="header">Manifestation du 22 mars</h3>
+                <p>en soutien aux cheminots, et contre la politique de Macron.</p>
             </div>
-        	{% endif %}
-  			
-  			<div class="ui error message"></div>
-		</form>
-	</div>
-	
-	<div class="actions">
-		<div class="ui black deny button">Annuler</div>
-		<div class="ui positive right labeled icon button">
-			Ajouter
-			<i class="add icon"></i>
-		</div>
-	</div>
+        </a>
+    </div>
 </div>
-
 {% endblock %}

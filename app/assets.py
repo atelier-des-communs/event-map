@@ -8,6 +8,7 @@ vendor_css = Bundle(
     output='styles/vendor.css')
 
 vendor_js = Bundle(
+    'vendor/moment.min.js',
     'vendor/tablesort.min.js',
     'vendor/location-picker.js', 
     filters='jsmin',
