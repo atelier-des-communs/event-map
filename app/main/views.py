@@ -32,7 +32,7 @@ def calendar():
 
     return render_template('main/calendar.html', form=form, json_events=json_events, events=events)
 
-@main.route('/', methods=['POST'])
+@main.route('/22-mars', methods=['POST'])
 def post_event():
 
     form = EventForm()

@@ -1,5 +1,5 @@
 from flask import current_app
-from datetime import  datetime
+from datetime import datetime
 from .. import db
 import pytz
 
@@ -21,10 +21,11 @@ class RemoteCountIP(db.Model):
 class Event(db.Model):
     __tablename__ = 'event'
     
-    creator = db.Column(db.DATETIME)
-    create_time = db.Column(db.String(64))
-    
     id = db.Column(db.Integer, primary_key=True)
+    
+    creator = db.Column(db.String(64))
+    create_time = db.Column(db.DATETIME)
+
     name = db.Column(db.String(64))
     description = db.Column(db.Text())
     
